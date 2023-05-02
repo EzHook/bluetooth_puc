@@ -1,14 +1,55 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import useBle from './useBle';
+import { useState } from 'react';
+import DeviceModal from './DeviceConnectionModal';
 
 export default function App() {
+
+  const {
+    requestPermissions,
+    scanForPeripherals
+  } = useBle();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const scanForDevices = async() => {
+    const isPermissionsEnabled = await requestPermissions();
+    if(isPermissionsEnabled) {
+      scanForPeripherals();
+    }
+  };
+
+  const hideModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const openModal = async () => {
+    scanForDevices();
+    setIsModalVisible(true);
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+    <StatusBar />
+      <Text style={styles.Heading}>Search for nearby Devices</Text>
+      <View>
+        <TouchableOpacity
+        onPress={openModal}>
+          <Text>Connect</Text>
+        </TouchableOpacity>
+        <DeviceModal
+          closeModal={hideModal}
+          visible={isModalvisible}
+          connectToPeripheral ={()=>{}}
+          devices={[]}
+         />
+      </View>
+    </SafeAreaView>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -17,4 +58,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  Heading : {
+    fontWeight: "bold",
+    fontSize: 20 ,
+    fontFamily:"sans-serif"
+    
+  }
 });
